@@ -123,7 +123,8 @@ struct AddTransactionView: View {
     
     private func addTransaction() {
         let newDate = enableDate ? date : nil
-        let transaction = Transaction(date: newDate, type: type, amount: amount!, note: note)
+        let newNote = note == "" ? nil : note
+        let transaction = Transaction(date: newDate, type: type, amount: amount!, note: newNote)
         modelContext.insert(transaction)
     }
 }

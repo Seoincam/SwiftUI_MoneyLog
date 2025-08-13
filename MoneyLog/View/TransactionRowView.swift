@@ -10,28 +10,20 @@ import SwiftUI
 struct TransactionRowView: View {
     let transaction: Transaction
     
-    private var amount: Int {
-        return transaction.type == .income ? transaction.amount : transaction.amount * -1
-    }
-    
-    private var color: Color {
-        return transaction.type == .income ? .red : .blue
-    }
-    
-    private var note: String {
-        return transaction.note != nil ? transaction.note! : "식비"
-    }
-    
     var body: some View {
         HStack {
             VStack {
                 Text("🌭")
-                    .font(.title)
+                    .font(.title2)
                     .padding(.trailing, 8)
             }
             
             VStack(alignment: .leading) {
-                Text(amount, format: .currency(code: "KRW"))
+                transaction.type == .income
+                ? Text("+ \(transaction.amount, format: .currency(code: "KRW"))")
+                    .foregroundStyle(color)
+                    .font(.title3)
+                : Text("- \(transaction.amount, format: .currency(code: "KRW"))")
                     .foregroundStyle(color)
                     .font(.title3)
                 
@@ -41,11 +33,20 @@ struct TransactionRowView: View {
             }
         }
     }
+    
+    
+    private var color: Color {
+        transaction.type == .income ? .red : .blue
+    }
+    
+    private var note: String {
+        transaction.note != nil ? transaction.note! : "식비"
+    }
 }
 
 #Preview {
     List {
         TransactionRowView(transaction: Transaction(date: Date.now, type: .expense, amount: 18000, note: "대면 작업 룸 & 밥"))
-        TransactionRowView(transaction: Transaction(date: Date.now, type: .expense, amount: 18000, note: nil))
+        TransactionRowView(transaction: Transaction(date: Date.now, type: .income, amount: 18000, note: nil))
     }
 }
