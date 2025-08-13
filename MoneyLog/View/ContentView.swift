@@ -13,12 +13,28 @@ struct ContentView: View {
     @State private var showingAddTransaction: Bool = false
     
     @State private var type: TransactionType = .expense
+    @State private var showingSummary = true
     
     var body: some View {
         NavigationStack {
-            TransactionListView()
-                .navigationTitle("25년 08월")
+            Group {
+                if showingSummary {
+                    TransactionSummaryView()
+                } else {
+                    TransactionListView()
+                }
+            }
+                .navigationTitle("2025년 08월")
                 .toolbar {
+                    ToolbarItem(placement: .topBarTrailing) {
+                        Picker("종류", selection: $showingSummary) {
+                            Text("요약").tag(true)
+                            Text("전체").tag(false)
+                        }
+                        .pickerStyle(.menu)
+                        .labelsHidden()
+                    }
+                    
                     ToolbarItem(placement: .topBarTrailing) {
                         Button("Add Item", systemImage: "plus") {
                             showingAddTransaction = true
@@ -26,12 +42,14 @@ struct ContentView: View {
                         .buttonStyle(.borderedProminent)
                     }
                 }
+            
             }
-        .sheet(isPresented: $showingAddTransaction) {
-            AddTransactionView()
-        }
+            .sheet(isPresented: $showingAddTransaction) {
+                AddTransactionView()
+            }
     }
 }
+
 
 #Preview {
     ContentView()
