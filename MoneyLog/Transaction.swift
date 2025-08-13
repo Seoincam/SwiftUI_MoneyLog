@@ -11,13 +11,13 @@ import SwiftData
 
 @Model
 final class Transaction {
-    var date: Date
+    var date: Date?
     var type: TransactionType
     var amount: Int
     var note: String?
     var createdAt: Date
     
-    init(date: Date,
+    init(date: Date?,
          type:TransactionType,
          amount: Int,
          note: String? = nil) {
