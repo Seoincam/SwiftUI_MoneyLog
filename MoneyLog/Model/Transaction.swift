@@ -20,12 +20,13 @@ final class Transaction {
     init(date: Date?,
          type:TransactionType,
          amount: Int,
-         note: String? = nil) {
+         note: String? = nil,
+         createdAt: Date = Date.now) {
         self.date = date
         self.type = type
         self.amount = amount
         self.note = note
-        createdAt = Date.now
+        self.createdAt = createdAt
     }
 }
 

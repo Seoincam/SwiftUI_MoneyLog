@@ -13,18 +13,12 @@ struct TransactionListView: View {
     
     var body: some View {
         List {
-            Section {
                 ForEach(transactions) { item in
-                    VStack {
-                        Text(item.createdAt, format: Date.FormatStyle(date: .omitted, time: .complete))
-                        Text(item.amount, format: .currency(code: "krw"))
-                    }
+                    TransactionRowView(transaction: item)
                 }
             }
         }
-
     }
-}
 
 #Preview {
     TransactionListView()
