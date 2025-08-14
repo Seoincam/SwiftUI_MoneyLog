@@ -12,25 +12,20 @@ struct TransactionRowView: View {
     
     var body: some View {
         HStack {
-            VStack {
-                Text("🌭")
-                    .font(.title2)
-                    .padding(.trailing, 8)
-            }
+            Text("🌭")
+                .font(.title2)
+                .padding(.trailing, 8)
             
-            VStack(alignment: .leading) {
-                transaction.type == .income
-                ? Text("+ \(transaction.amount, format: .currency(code: "KRW"))")
-                    .foregroundStyle(color)
-                    .font(.title3)
-                : Text("- \(transaction.amount, format: .currency(code: "KRW"))")
-                    .foregroundStyle(color)
-                    .font(.title3)
-                
-                Text(note)
-                    .font(.callout)
-                    .foregroundStyle(.gray)
-            }
+            amountText
+                .foregroundStyle(color)
+                .font(.title3)
+            
+            Text(note)
+                .font(.callout)
+                .foregroundStyle(.gray)
+        }
+        .onTapGesture {
+            
         }
     }
     
@@ -42,11 +37,16 @@ struct TransactionRowView: View {
     private var note: String {
         transaction.note != nil ? transaction.note! : "식비"
     }
+    
+    private var amountText: Text {
+        let sign = transaction.type == .income ? "+" : "-"
+        return Text("\(sign)\(transaction.amount, format: WonStyleInt())")
+    }
 }
 
 #Preview {
     List {
         TransactionRowView(transaction: Transaction(date: Date.now, type: .expense, amount: 18000, note: "대면 작업 룸 & 밥"))
-        TransactionRowView(transaction: Transaction(date: Date.now, type: .income, amount: 18000, note: nil))
+        TransactionRowView(transaction: Transaction(date: Date.now, type: .income, amount: 600000, note: nil))
     }
 }

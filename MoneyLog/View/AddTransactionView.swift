@@ -42,7 +42,7 @@ struct AddTransactionView: View {
                     }
                     
                     VStack {
-                        TextField("금액", value: $amount, format: .currency(code: "KRW"))
+                        TextField("금액", value: $amount, format: WonStyleInt())
                             .keyboardType(.numberPad)
                             .focused($keyboardFocused)
                             .font(.title)

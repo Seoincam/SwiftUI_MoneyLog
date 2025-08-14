@@ -20,6 +20,7 @@ struct TransactionListView: View {
                         TransactionRowView(transaction: item)
                     }
                 }
+                
             }
             
             ForEach(sortedDays, id: \.self) { day in
@@ -28,7 +29,7 @@ struct TransactionListView: View {
                         TransactionRowView(transaction: item)
                     }
                 }
-            } 
+            }
         }
     }
     

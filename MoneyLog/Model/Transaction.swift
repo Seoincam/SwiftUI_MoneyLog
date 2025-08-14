@@ -15,17 +15,22 @@ final class Transaction {
     var type: TransactionType
     var amount: Int
     var note: String?
+    
+    @Relationship(inverse: \Category.transactions)
+    var category: Category?
     var createdAt: Date
     
     init(date: Date?,
          type:TransactionType,
          amount: Int,
          note: String? = nil,
+         category: Category? = nil,
          createdAt: Date = Date.now) {
         self.date = date
         self.type = type
         self.amount = amount
         self.note = note
+        self.category = category
         self.createdAt = createdAt
     }
 }

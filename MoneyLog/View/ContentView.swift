@@ -14,27 +14,35 @@ struct ContentView: View {
     @State private var type: TransactionType = .expense
     
     var body: some View {
-        NavigationStack {
-            TabView {
-                Tab("요약", systemImage: "text.rectangle") {
+        TabView {
+            Tab("요약", systemImage: "text.rectangle") {
+                NavigationStack {
                     TransactionSummaryView()
-                }
-                
-                Tab("전체", systemImage: "list.bullet") {
-                    TransactionListView()
+                        .navigationTitle("2025년")
+                        .toolbar { addToolbar }
                 }
             }
-            .toolbar {
-                ToolbarItem(placement: .topBarTrailing) {
-                    Button("Add Item", systemImage: "plus") {
-                        showingAddTransaction = true
-                    }
-                    .buttonStyle(.borderedProminent)
+            
+            Tab("전체", systemImage: "list.bullet") {
+                NavigationStack {
+                    TransactionListView()
+                        .navigationTitle("2025년 8월")
+                        .toolbar { addToolbar }
                 }
             }
         }
         .sheet(isPresented: $showingAddTransaction) {
             AddTransactionView()
+        }
+    }
+    
+    @ToolbarContentBuilder
+    private var addToolbar: some ToolbarContent {
+        ToolbarItem(placement: .topBarTrailing) {
+            Button("Add Item", systemImage: "plus") {
+                showingAddTransaction = true
+            }
+            .buttonStyle(.borderedProminent)
         }
     }
 }

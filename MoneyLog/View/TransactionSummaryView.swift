@@ -18,7 +18,7 @@ struct TransactionSummaryView: View {
                     Image(systemName: "wallet.bifold")
                     Text("잔액")
                     Spacer()
-                    Text("+ \(total, format: .currency(code: "KRW"))")
+                    Text("\(total, format: WonStyleInt())")
                         .foregroundStyle(color(amount: total))
                 }
                 .font(.title3)
@@ -31,7 +31,7 @@ struct TransactionSummaryView: View {
                     Text("수익 총괄")
                         .foregroundStyle(.gray)
                     Spacer()
-                    Text("+ \(incomeTotal, format: .currency(code: "KRW"))")
+                    Text("+\(incomeTotal, format: WonStyleInt())")
                         .foregroundStyle(.red)
                 }
                 .font(.callout)
@@ -41,14 +41,12 @@ struct TransactionSummaryView: View {
                     Text("지출 총괄")
                         .foregroundStyle(.gray)
                     Spacer()
-                    Text("- \(expenseTotal, format: .currency(code: "KRW"))")
+                    Text("-\(expenseTotal, format: WonStyleInt())")
                         .foregroundStyle(.blue)
                 }
                 .font(.callout)
             }
         }
-
-        
     }
     
     private var total: Int {
