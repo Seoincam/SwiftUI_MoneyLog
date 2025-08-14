@@ -47,6 +47,8 @@ struct TransactionSummaryView: View {
                 .font(.callout)
             }
         }
+
+        
     }
     
     private var total: Int {

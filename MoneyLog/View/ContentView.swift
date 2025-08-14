@@ -11,42 +11,31 @@ import SwiftData
 struct ContentView: View {
     @Environment(\.modelContext) private var modelContext
     @State private var showingAddTransaction: Bool = false
-    
     @State private var type: TransactionType = .expense
-    @State private var showingSummary = true
     
     var body: some View {
         NavigationStack {
-            Group {
-                if showingSummary {
+            TabView {
+                Tab("요약", systemImage: "text.rectangle") {
                     TransactionSummaryView()
-                } else {
+                }
+                
+                Tab("전체", systemImage: "list.bullet") {
                     TransactionListView()
                 }
             }
-                .navigationTitle("2025년 08월")
-                .toolbar {
-                    ToolbarItem(placement: .topBarTrailing) {
-                        Picker("종류", selection: $showingSummary) {
-                            Text("요약").tag(true)
-                            Text("전체").tag(false)
-                        }
-                        .pickerStyle(.menu)
-                        .labelsHidden()
+            .toolbar {
+                ToolbarItem(placement: .topBarTrailing) {
+                    Button("Add Item", systemImage: "plus") {
+                        showingAddTransaction = true
                     }
-                    
-                    ToolbarItem(placement: .topBarTrailing) {
-                        Button("Add Item", systemImage: "plus") {
-                            showingAddTransaction = true
-                        }
-                        .buttonStyle(.borderedProminent)
-                    }
+                    .buttonStyle(.borderedProminent)
                 }
-            
             }
-            .sheet(isPresented: $showingAddTransaction) {
-                AddTransactionView()
-            }
+        }
+        .sheet(isPresented: $showingAddTransaction) {
+            AddTransactionView()
+        }
     }
 }
 
