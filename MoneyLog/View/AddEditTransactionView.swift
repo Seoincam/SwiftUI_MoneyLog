@@ -8,28 +8,41 @@
 import SwiftUI
 import SwiftData
 
-struct AddTransactionView: View {
+struct AddEditTransactionView: View {
     @Environment(\.modelContext) private var modelContext
     @Environment(\.dismiss) private var dismiss
     
     @FocusState private var keyboardFocused: Bool
     
-    @State private var type: TransactionType = .income
-    @State private var amount: Int? = nil
-    @State private var enableDate = true
-    @State private var date = Date.now
-    @State private var note: String = ""
+    let isAdding: Bool
+    let transaction: Transaction?
     
-    private var calendarText: String {
-        return type == .income ? "입금일" : "출금일"
+    @State private var type: TransactionType
+    @State private var amount: Int?
+    @State private var enableDate: Bool
+    @State private var date: Date
+    @State private var note: String
+    
+    init() {
+        isAdding = true
+        transaction = nil
+        
+        type = .income
+        amount = nil
+        enableDate = true
+        date = Date.now
+        note = ""
     }
     
-    private var color: Color {
-        return type == .income ? .red : .blue
-    }
-    
-    private var canAdd: Bool {
-        return amount != nil
+    init(transaction: Transaction) {
+        isAdding = false
+        self.transaction = transaction
+        
+        type = transaction.type
+        amount = transaction.amount
+        enableDate = transaction.date != nil
+        date = transaction.date ?? Date.now
+        note = transaction.note ?? ""
     }
     
     var body: some View {
@@ -71,7 +84,7 @@ struct AddTransactionView: View {
                     
                     if enableDate {
                         HStack {
-                            Image(systemName: "1.calendar")
+                            calendarImage
                                 .font(.title3)
                                 .foregroundStyle(.gray)
                                 .padding(4)
@@ -93,6 +106,7 @@ struct AddTransactionView: View {
                 
                 Section {
                     TextField("설명", text: $note)
+                        .focused($keyboardFocused)
                 }
             }
             .animation(.default, value: enableDate)
@@ -105,13 +119,13 @@ struct AddTransactionView: View {
                 }
                 
                 ToolbarItem(placement: .principal) {
-                    Text("추가하기")
+                    titleText
                         .font(.title3)
                 }
                 
                 ToolbarItem(placement: .topBarTrailing) {
-                    Button("Add Transaction", systemImage: "checkmark") {
-                        addTransaction()
+                    Button("Add or Edit Transaction", systemImage: "checkmark") {
+                        addEditTransform()
                         dismiss()
                     }
                     .disabled(!canAdd)
@@ -121,14 +135,45 @@ struct AddTransactionView: View {
         }
     }
     
-    private func addTransaction() {
+    private var titleText: Text {
+        isAdding ? Text("항목 추가") : Text("항목 수정")
+    }
+    
+    private var calendarText: String {
+        return type == .income ? "입금일" : "출금일"
+    }
+    
+    private var calendarImage: Image {
+        let calendar = Calendar.current
+        let day = String(calendar.component(.day, from: date))
+        let imageName = day + ".calendar"
+        return Image(systemName: imageName)
+    }
+    
+    private var color: Color {
+        return type == .income ? .red : .blue
+    }
+    
+    private var canAdd: Bool {
+        return amount != nil
+    }
+    
+    private func addEditTransform() {
         let newDate = enableDate ? date : nil
         let newNote = note == "" ? nil : note
-        let transaction = Transaction(date: newDate, type: type, amount: amount!, note: newNote)
-        modelContext.insert(transaction)
+        
+        if isAdding {
+            let transaction = Transaction(date: newDate, type: type, amount: amount!, note: newNote)
+            modelContext.insert(transaction)
+        } else {
+            transaction!.type = type
+            transaction!.amount = amount!
+            transaction!.date = newDate
+            transaction!.note = newNote
+        }
     }
 }
 
 #Preview {
-    AddTransactionView()
+    AddEditTransactionView(transaction: Transaction(date: Date.now, type: .income, amount: 12000))
 }

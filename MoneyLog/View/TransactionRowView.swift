@@ -24,9 +24,7 @@ struct TransactionRowView: View {
                 .font(.callout)
                 .foregroundStyle(.gray)
         }
-        .onTapGesture {
-            
-        }
+        .contentShape(Rectangle())
     }
     
     

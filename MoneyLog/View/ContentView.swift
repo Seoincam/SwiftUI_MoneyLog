@@ -10,7 +10,7 @@ import SwiftData
 
 struct ContentView: View {
     @Environment(\.modelContext) private var modelContext
-    @State private var showingAddTransaction: Bool = false
+    @State private var showingAddEdit: Bool = false
     @State private var type: TransactionType = .expense
     
     var body: some View {
@@ -31,8 +31,8 @@ struct ContentView: View {
                 }
             }
         }
-        .sheet(isPresented: $showingAddTransaction) {
-            AddTransactionView()
+        .sheet(isPresented: $showingAddEdit) {
+            AddEditTransactionView()
         }
     }
     
@@ -40,9 +40,8 @@ struct ContentView: View {
     private var addToolbar: some ToolbarContent {
         ToolbarItem(placement: .topBarTrailing) {
             Button("Add Item", systemImage: "plus") {
-                showingAddTransaction = true
+                showingAddEdit = true
             }
-            .buttonStyle(.borderedProminent)
         }
     }
 }

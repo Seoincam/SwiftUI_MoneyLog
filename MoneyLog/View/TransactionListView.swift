@@ -12,12 +12,20 @@ struct TransactionListView: View {
     @Environment(\.calendar) private var calendar
     @Query private var transactions: [Transaction]
     
+    @State private var showingAddEdit = false
+    @State private var selectedTransaction: Transaction? = nil
+    
     var body: some View {
         List {
             if !undated.isEmpty {
                 Section(header: Text("날짜 없음")) {
                     ForEach(undated) { item in
-                        TransactionRowView(transaction: item)
+                        Button {
+                            selectedTransaction = item
+                            showingAddEdit = true
+                        } label: {
+                            TransactionRowView(transaction: item)
+                        }
                     }
                 }
                 
@@ -26,14 +34,22 @@ struct TransactionListView: View {
             ForEach(sortedDays, id: \.self) { day in
                 Section(header: Text(sectionTitle(for: day))) {
                     ForEach (datedDict[day] ?? []) { item in
-                        TransactionRowView(transaction: item)
+                        Button {
+                            selectedTransaction = item
+                            showingAddEdit = true
+                        } label: {
+                            TransactionRowView(transaction: item)
+                        }
                     }
                 }
             }
         }
+        .sheet(item: $selectedTransaction) { item in
+            AddEditTransactionView(transaction: item)
+        }
     }
     
-    // MARK: - 정렬 도우미
+    // MARK: - 정렬
     
     private var datedPairs: [(Date, Transaction)] {
         transactions.compactMap { t in
