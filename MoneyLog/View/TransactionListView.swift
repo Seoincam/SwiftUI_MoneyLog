@@ -9,43 +9,41 @@ import SwiftUI
 import SwiftData
 
 struct TransactionListView: View {
+    @Environment(\.modelContext) private var context
     @Environment(\.calendar) private var calendar
     @Query private var transactions: [Transaction]
     
-    @State private var showingAddEdit = false
     @State private var selectedTransaction: Transaction? = nil
     
     var body: some View {
         List {
             if !undated.isEmpty {
                 Section(header: Text("날짜 없음")) {
-                    ForEach(undated) { item in
+                    ForEach(undated) { t in
                         Button {
-                            selectedTransaction = item
-                            showingAddEdit = true
+                            selectedTransaction = t
                         } label: {
-                            TransactionRowView(transaction: item)
+                            TransactionRowView(transaction: t)
                         }
                     }
                 }
-                
             }
             
             ForEach(sortedDays, id: \.self) { day in
                 Section(header: Text(sectionTitle(for: day))) {
-                    ForEach (datedDict[day] ?? []) { item in
+                    ForEach (datedDict[day] ?? []) { t in
                         Button {
-                            selectedTransaction = item
-                            showingAddEdit = true
+                            selectedTransaction = t
                         } label: {
-                            TransactionRowView(transaction: item)
+                            TransactionRowView(transaction: t)
                         }
                     }
                 }
             }
         }
-        .sheet(item: $selectedTransaction) { item in
-            AddEditTransactionView(transaction: item)
+        .sheet(item: $selectedTransaction) { t in
+            EditTransactionView(transaction: t)
+                .modelContext(context)
         }
     }
     

@@ -12,7 +12,7 @@ struct TransactionRowView: View {
     
     var body: some View {
         HStack {
-            Text("🌭")
+            Text(transaction.category.symbol)
                 .font(.title2)
                 .padding(.trailing, 8)
             
@@ -20,9 +20,8 @@ struct TransactionRowView: View {
                 .foregroundStyle(color)
                 .font(.title3)
             
-            Text(note)
+            note
                 .font(.callout)
-                .foregroundStyle(.gray)
         }
         .contentShape(Rectangle())
     }
@@ -32,8 +31,14 @@ struct TransactionRowView: View {
         transaction.type == .income ? .red : .blue
     }
     
-    private var note: String {
-        transaction.note != nil ? transaction.note! : "식비"
+    private var note: Text {
+        transaction.note != nil
+        ? Text(transaction.note!)
+            .foregroundStyle(.black)
+
+        : Text(transaction.category.name)
+            .foregroundStyle(.gray)
+
     }
     
     private var amountText: Text {
@@ -44,7 +49,7 @@ struct TransactionRowView: View {
 
 #Preview {
     List {
-        TransactionRowView(transaction: Transaction(date: Date.now, type: .expense, amount: 18000, note: "대면 작업 룸 & 밥"))
-        TransactionRowView(transaction: Transaction(date: Date.now, type: .income, amount: 600000, note: nil))
+        TransactionRowView(transaction: Transaction(date: Date.now, type: .expense, amount: 18000, note: "대면 작업 룸 & 밥", category: Category(symbol: "😶", name: "기타 지출", type: .expense)))
+        TransactionRowView(transaction: Transaction(date: Date.now, type: .income, amount: 600000, note: nil, category: Category(symbol: "💵", name: "용돈", type: .income)))
     }
 }

@@ -8,34 +8,25 @@
 import SwiftUI
 import SwiftData
 
-struct AddEditTransactionView: View {
-    @Environment(\.modelContext) private var modelContext
+struct EditTransactionView: View {
+    @Environment(\.modelContext) private var context
     @Environment(\.dismiss) private var dismiss
     
     @FocusState private var keyboardFocused: Bool
+    @State private var showingCategorySelect: Bool = false
     
-    let isAdding: Bool
-    let transaction: Transaction?
+    let transaction: Transaction
     
     @State private var type: TransactionType
     @State private var amount: Int?
-    @State private var enableDate: Bool
-    @State private var date: Date
+    @State private var category: Category
     @State private var note: String
     
-    init() {
-        isAdding = true
-        transaction = nil
-        
-        type = .income
-        amount = nil
-        enableDate = true
-        date = Date.now
-        note = ""
-    }
+    @State private var enableDate: Bool
+    @State private var date: Date
+
     
     init(transaction: Transaction) {
-        isAdding = false
         self.transaction = transaction
         
         type = transaction.type
@@ -43,7 +34,9 @@ struct AddEditTransactionView: View {
         enableDate = transaction.date != nil
         date = transaction.date ?? Date.now
         note = transaction.note ?? ""
+        category = transaction.category
     }
+    
     
     var body: some View {
         NavigationStack {
@@ -54,13 +47,14 @@ struct AddEditTransactionView: View {
                         Text("출금").tag(TransactionType.expense)
                     }
                     
-                    VStack {
+                    HStack {
+                        plusMinus
                         TextField("금액", value: $amount, format: WonStyleInt())
                             .keyboardType(.numberPad)
                             .focused($keyboardFocused)
-                            .font(.title)
-                            .foregroundStyle(color)
                         }
+                        .font(.title)
+                        .foregroundStyle(color)
                         .toolbar {
                             // FIXME: 간격 문제로 추후 수정해야함.
                             // safeAreaInset 찾아보기
@@ -71,6 +65,43 @@ struct AddEditTransactionView: View {
                             }
                         }
                 }
+//                .onChange(of: type) {
+//                    category = nil
+//                }
+                
+                Section("세부사항") {
+                    NavigationLink {
+                        SelectCategoryView(type: type, category: Binding<Category?>($category))
+                    } label: {
+                        HStack {
+                            Image(systemName: "list.bullet")
+                                .font(.title3)
+                                .foregroundStyle(.gray)
+                                .padding(4)
+                            
+                            Text("카테고리")
+                                .foregroundStyle(.black)
+                            
+                            Spacer()
+
+                            Text(category.symbol)
+                            Text(category.name)
+
+                            
+                        }
+                    }
+                    
+                    HStack {
+                        Image(systemName: "text.bubble")
+                            .font(.title3)
+                            .foregroundStyle(.gray)
+                            .padding(4)
+
+                        TextField("설명", text: $note)
+                            .focused($keyboardFocused)
+                    }
+                }
+                .listSectionSpacing(.compact)
                 
                 Section {
                     HStack {
@@ -103,44 +134,23 @@ struct AddEditTransactionView: View {
                         }
                     }
                 }
-                
-                Section {
-                    TextField("설명", text: $note)
-                        .focused($keyboardFocused)
-                }
             }
             .animation(.default, value: enableDate)
             
-            .toolbar {
-                ToolbarItem(placement: .cancellationAction) {
-                    Button("취소") {
-                        dismiss()
-                    }
-                }
-                
-                ToolbarItem(placement: .principal) {
-                    titleText
-                        .font(.title3)
-                }
-                
-                ToolbarItem(placement: .topBarTrailing) {
-                    Button("Add or Edit Transaction", systemImage: "checkmark") {
-                        addEditTransform()
-                        dismiss()
-                    }
-                    .disabled(!canAdd)
-                    .buttonStyle(.borderedProminent)
-                }
-            }
+            .toolbar { toolbar }
         }
     }
     
-    private var titleText: Text {
-        isAdding ? Text("항목 추가") : Text("항목 수정")
+    
+    // MARK: - Helper
+    
+    private var plusMinus: Text {
+        type == .income ? Text("+") : Text("-")
     }
+
     
     private var calendarText: String {
-        return type == .income ? "입금일" : "출금일"
+        type == .income ? "입금일" : "출금일"
     }
     
     private var calendarImage: Image {
@@ -150,30 +160,55 @@ struct AddEditTransactionView: View {
         return Image(systemName: imageName)
     }
     
-    private var color: Color {
-        return type == .income ? .red : .blue
-    }
+    private var color: Color { type == .income ? .red : .blue }
     
     private var canAdd: Bool {
-        return amount != nil
+        amount != nil
     }
+    
+    @ToolbarContentBuilder
+    private var toolbar: some ToolbarContent {
+        ToolbarItem(placement: .cancellationAction) {
+            Button {
+                dismiss()
+            } label: {
+                Image(systemName: "xmark")
+            }
+            
+        }
+        
+        ToolbarItem(placement: .principal) {
+            Text("항목 수정")
+                .font(.default)
+        }
+        
+        ToolbarItem(placement: .topBarTrailing) {
+            Button("Add or Edit Transaction", systemImage: "checkmark") {
+                addEditTransform()
+                dismiss()
+            }
+            .disabled(!canAdd)
+            .buttonStyle(.borderedProminent)
+        }
+    }
+    
+    
+    // MARK: - func
     
     private func addEditTransform() {
         let newDate = enableDate ? date : nil
         let newNote = note == "" ? nil : note
         
-        if isAdding {
-            let transaction = Transaction(date: newDate, type: type, amount: amount!, note: newNote)
-            modelContext.insert(transaction)
-        } else {
-            transaction!.type = type
-            transaction!.amount = amount!
-            transaction!.date = newDate
-            transaction!.note = newNote
-        }
+        transaction.type = type
+        transaction.amount = amount!
+        transaction.date = newDate
+        transaction.note = newNote
+        transaction.category = category
     }
+    
 }
 
 #Preview {
-    AddEditTransactionView(transaction: Transaction(date: Date.now, type: .income, amount: 12000))
+    EditTransactionView(transaction: Transaction(date: Date.now, type: .expense, amount: 12000, category: Category(symbol: "🎁", name: "사고 싶어요", type: .expense)))
+        .modelContainer(PreviewContainer.shared.container)
 }

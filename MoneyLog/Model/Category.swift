@@ -10,14 +10,16 @@ import SwiftData
 
 @Model
 final class Category {
-    var emoji: String
+    var symbol: String
     var name: String
+    var type: TransactionType
     
     @Relationship(deleteRule: .nullify)
     var transactions: [Transaction] = []
     
-    init(emoji: String, name: String) {
-        self.emoji = emoji
+    init(symbol: String, name: String, type: TransactionType) {
+        self.symbol = symbol
         self.name = name
+        self.type = type
     }
 }
